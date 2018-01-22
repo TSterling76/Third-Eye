@@ -1,5 +1,10 @@
 // Grocery list - POST https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/map
+
+var dataSet;
+var dataEX;
+
 function getRecipesJson(titleKeyword, amount) {
+
     var apiKey = "hl4Qem5ONzmshsBh8TTKYwDTPDlGp1TeFb1jsnltTh4MAJoIhQ";
     if (amount == null || amount==''){
         amount = 5;
@@ -17,10 +22,9 @@ function getRecipesJson(titleKeyword, amount) {
         cache: false,
         url: url,
         success: function (data) {
-             console.log((data));
-             parseRecipes(data);
-        // getRecipeIDJson(data.results[0].id);
-        
+            dataSet = data;
+            console.log((dataSet));
+            parseRecipes();
         },
 
         error: function(err) { 
@@ -31,7 +35,7 @@ function getRecipesJson(titleKeyword, amount) {
             xhr.setRequestHeader("X-Mashape-Authorization", apiKey);
     }
 
-    })
+    });
 
 }
 
@@ -49,10 +53,11 @@ function getRecipeIDJson(recipeID) {
         cache: false,
         url: url,
         success: function (data) {
-
-            console.log((data.extendedIngredients));
-            parseIngredients(data.extendedIngredients);
-        // getRecipeJson(data.results[0].id);
+            dataEX = data.extendedIngredients;
+            console.log("The Ingredients for your recipes Include..");
+            console.log((dataEX));
+            parseRecipesInfo();
+            // getRecipeJson(data.results[0].id);
         },
 
         error: function(err) { 
@@ -61,31 +66,34 @@ function getRecipeIDJson(recipeID) {
 
         beforeSend: function(xhr) {
             xhr.setRequestHeader("X-Mashape-Authorization", apiKey);
-    }
+        }
 
     });     
 }
 
-function parseIngredients(data){
-   var array = data;
+function parseRecipes(){
+    var json = dataSet;
 
-   for(var i = 0; i < array.length; i++){
+    var i;
+    for(i = 0; i < json.length; i++){
+        var obj = json[i];
+        console.log("[Result "+(i+1) + "] Recipe ID Number: "+ obj.id+", Recipe Name: " + obj.title);
+        getRecipeIDJson(obj.id);
+
+    }
+    
+    console.log("We found " + i + " results");
+}
+
+function parseRecipesInfo(){
+    var array = dataEX;
+
+    for(var i = 0; i < array.length; i++){
         var obj = array[i];
-        
+       
         console.log("[Result "+(i+1) + "]  The Aisle: " + obj.aisle + ", \n The Name of Ingredient: "+ obj.name + 
         ", \n The Amount of Materials Needed: " + obj.originalString);
    }
 }
 
-function parseRecipes(data){
-    var json = data;
 
-    for(var i = 0; i < json.length; i++){
-        var obj = json[i];
-        console.log("[Result "+(i+1) + "] Recipe ID Number: "+ obj.id+", Recipe Name: " + obj.title + ", with Image:"+ obj.image);
-        getRecipeIDJson(obj.id);
-       
-   }
-
-
-}
